@@ -9,7 +9,10 @@ import pandas as pd
 from datetime import datetime, date
 
 # Mevcut warrant_returns.py'den fonksiyonları import et
-from warrant_returns import get_active_warrants, get_prices, calculate_returns
+from warrant_returns import (
+    get_active_warrants, get_prices, calculate_returns,
+    load_warrants_from_csv, load_prices_from_csv
+)
 
 app = Flask(__name__)
 
@@ -54,9 +57,29 @@ def analyze():
         end = datetime.strptime(end_date, '%Y-%m-%d').date()
         expiry = datetime.strptime(expiry_date, '%Y-%m-%d').date() if expiry_date else None
 
-        # Varant verilerini çek
-        warrants = get_active_warrants(end, expiry)
-        prices = get_prices(warrants['code'].tolist(), start, end)
+        # CSV dosyaları kontrol et
+        warrants_file = request.files.get('warrants_csv')
+        prices_file = request.files.get('prices_csv')
+
+        has_warrants_csv = warrants_file and warrants_file.filename != ''
+        has_prices_csv = prices_file and prices_file.filename != ''
+
+        if has_warrants_csv != has_prices_csv:
+            return render_template('results.html',
+                                 error="Her iki CSV dosyası da yüklenmelidir veya hiçbiri yüklenmeyin.",
+                                 start_date=start_date,
+                                 end_date=end_date)
+
+        if has_warrants_csv and has_prices_csv:
+            # CSV modu
+            warrants = load_warrants_from_csv(warrants_file, end, expiry)
+            prices = load_prices_from_csv(prices_file, warrants['code'].tolist(), start, end)
+            data_source = 'CSV'
+        else:
+            # DB modu
+            warrants = get_active_warrants(end, expiry)
+            prices = get_prices(warrants['code'].tolist(), start, end)
+            data_source = 'Veritabanı'
 
         if prices.empty:
             return render_template('results.html',
@@ -84,7 +107,8 @@ def analyze():
                              date_range=date_range,
                              start_date=start_date,
                              end_date=end_date,
-                             total_analyzed=len(results))
+                             total_analyzed=len(results),
+                             data_source=data_source)
 
     except Exception as e:
         return render_template('results.html',

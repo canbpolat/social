@@ -18,6 +18,65 @@ BARBAR_DSN = "postgresql://postgres:bRmluoDvJJR5caXpIfBTX1gJ7uvcoOIjzHYHqv1gdJ5x
 FINTABLES_DSN = "postgresql://postgres:h4pjkshmuz9jui06@94.130.134.36:5432/postgres"
 
 
+def load_warrants_from_csv(csv_source, end_date, min_expiry=None):
+    """CSV dosyasından varant verilerini yükler ve filtreler.
+    csv_source: dosya yolu (str) veya file-like object (Flask upload)
+    CSV sütunları: code, underlying, option_type, strike_price, issuer_name, expiry
+    """
+    df = pd.read_csv(csv_source, encoding='utf-8-sig')
+
+    required_cols = ['code', 'underlying', 'option_type', 'strike_price', 'expiry']
+    missing = [c for c in required_cols if c not in df.columns]
+    if missing:
+        raise ValueError(f"Varant CSV'de eksik sütunlar: {', '.join(missing)}")
+
+    if 'issuer_name' not in df.columns:
+        df['issuer_name'] = df.get('issuer_id', '-')
+
+    df['code'] = df['code'].str.strip()
+    df['expiry'] = pd.to_datetime(df['expiry']).dt.date
+    df['strike_price'] = pd.to_numeric(df['strike_price'], errors='coerce')
+
+    df = df[df['expiry'] > end_date]
+    if min_expiry:
+        df = df[df['expiry'] >= min_expiry]
+
+    df['option_type'] = df['option_type'].map({'call': 'A', 'put': 'S'}).fillna(df['option_type'])
+
+    return df
+
+
+def load_prices_from_csv(csv_source, codes, start_date, end_date):
+    """CSV dosyasından fiyat verilerini yükler.
+    csv_source: dosya yolu (str) veya file-like object (Flask upload)
+    CSV sütunları: code, date, close
+    """
+    df = pd.read_csv(csv_source, encoding='utf-8-sig')
+
+    # bucket sütunu varsa date olarak yeniden adlandır
+    if 'bucket' in df.columns and 'date' not in df.columns:
+        df = df.rename(columns={'bucket': 'date'})
+
+    required_cols = ['code', 'date', 'close']
+    missing = [c for c in required_cols if c not in df.columns]
+    if missing:
+        raise ValueError(f"Fiyat CSV'de eksik sütunlar: {', '.join(missing)}")
+
+    df['code'] = df['code'].str.strip()
+    df['date'] = pd.to_datetime(df['date'], utc=True).dt.tz_convert('Europe/Istanbul').dt.date
+    df = df.drop_duplicates(subset=['code', 'date'], keep='last')
+    df = df[df['code'].isin(codes)]
+
+    start_prices = df[df['date'] == start_date][['code', 'close']].rename(columns={'close': 'start_price'})
+    start_prices['start_date'] = start_date
+
+    end_prices = df[df['date'] == end_date][['code', 'close']].rename(columns={'close': 'end_price'})
+    end_prices['end_date'] = end_date
+
+    result = start_prices.merge(end_prices, on='code', how='inner')
+    return result
+
+
 def get_active_warrants(end_date, min_expiry=None):
     """
     Belirtilen tarihte aktif olan varantları ve ihraççı bilgilerini fintables_db'den çeker.
@@ -147,8 +206,15 @@ def main():
     parser.add_argument('--output', '-o', help='Çıktı dosyası (opsiyonel)')
     parser.add_argument('--format', '-f', choices=['csv', 'json'], default='csv', help='Çıktı formatı (csv veya json)')
     parser.add_argument('--lite', action='store_true', help='Sadece en yüksek 10 ve en düşük 10 varantı kaydet')
+    parser.add_argument('--warrants-csv', help='Varant verilerini CSV dosyasından yükle (DB yerine)')
+    parser.add_argument('--prices-csv', help='Fiyat verilerini CSV dosyasından yükle (DB yerine)')
 
     args = parser.parse_args()
+
+    if bool(args.warrants_csv) != bool(args.prices_csv):
+        parser.error("--warrants-csv ve --prices-csv birlikte kullanılmalıdır")
+
+    use_csv = args.warrants_csv is not None
 
     # Tarihleri parse et
     start_date = datetime.strptime(args.start_date, '%Y-%m-%d').date()
@@ -158,15 +224,20 @@ def main():
     print(f"Tarih Aralığı: {start_date} - {end_date}")
     if min_expiry:
         print(f"Minimum Expiry: {min_expiry}")
+    print(f"Veri kaynağı: {'CSV' if use_csv else 'Veritabanı'}")
     print("Aktif varantlar yükleniyor...")
 
-    # Aktif varantları çek (bitiş tarihinde henüz expire olmamış olanlar)
-    warrants = get_active_warrants(end_date, min_expiry)
+    if use_csv:
+        warrants = load_warrants_from_csv(args.warrants_csv, end_date, min_expiry)
+    else:
+        warrants = get_active_warrants(end_date, min_expiry)
     print(f"  {len(warrants)} aktif varant bulundu")
 
-    # Fiyatları çek
     print("Fiyat verileri yükleniyor...")
-    prices = get_prices(warrants['code'].tolist(), start_date, end_date)
+    if use_csv:
+        prices = load_prices_from_csv(args.prices_csv, warrants['code'].tolist(), start_date, end_date)
+    else:
+        prices = get_prices(warrants['code'].tolist(), start_date, end_date)
     print(f"  {len(prices)} varant için fiyat verisi bulundu")
 
     if prices.empty:

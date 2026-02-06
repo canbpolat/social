@@ -22,7 +22,7 @@
         <!-- Üst navigasyon -->
         <div class="nav-bar">
             <a href="/" class="btn-back">← Yeni Analiz</a>
-            <span class="total-info">Toplam {{ total_analyzed }} varant analiz edildi</span>
+            <span class="total-info">Toplam {{ total_analyzed }} varant analiz edildi{% if data_source %} ({{ data_source }}){% endif %}</span>
         </div>
 
         <!-- EN ÇOK YÜKSELEN VARANTLAR -->
@@ -125,6 +125,13 @@
             </button>
         </div>
 
+        <!-- CSV İndirme Butonu -->
+        <div class="card-wrapper">
+            <button onclick="downloadCSV()" class="btn-download csv">
+                CSV İndir (Tüm Veriler)
+            </button>
+        </div>
+
         {% endif %}
     </div>
 
@@ -144,6 +151,41 @@
                 link.click();
             });
         }
+
+        // CSV indirme fonksiyonu
+        {% if rising_warrants and falling_warrants %}
+        var allWarrants = {{ (rising_warrants + falling_warrants) | tojson }};
+
+        function downloadCSV() {
+            var headers = ['Grup', 'Kod', 'Tür', 'Dayanak', 'İhraççı', 'Kullanım Fiyatı', 'Başlangıç Fiyatı', 'Bitiş Fiyatı', 'Değişim (%)'];
+            var rows = [headers.join(',')];
+
+            var risingCount = {{ rising_warrants | length }};
+
+            allWarrants.forEach(function(w, i) {
+                var grup = i < risingCount ? 'Yükselen' : 'Düşen';
+                var row = [
+                    grup,
+                    w.code,
+                    w.option_type,
+                    w.underlying || '-',
+                    '"' + (w.issuer_name || '-') + '"',
+                    (w.strike_price || 0).toFixed(2),
+                    (w.start_price || 0).toFixed(2),
+                    (w.end_price || 0).toFixed(2),
+                    (w.return_pct || 0).toFixed(2)
+                ];
+                rows.push(row.join(','));
+            });
+
+            var csv = '\uFEFF' + rows.join('\n');
+            var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            var link = document.createElement('a');
+            link.download = 'varant_analiz.csv';
+            link.href = URL.createObjectURL(blob);
+            link.click();
+        }
+        {% endif %}
     </script>
 </body>
 </html>

@@ -13,7 +13,7 @@
             <p class="subtitle">En çok yükselen ve düşen varantları analiz edin</p>
         </div>
 
-        <form action="/analyze" method="POST" class="form-container">
+        <form action="/analyze" method="POST" enctype="multipart/form-data" class="form-container">
             <div class="form-group">
                 <label for="start_date">Başlangıç Tarihi</label>
                 <input type="date" id="start_date" name="start_date" value="{{ default_start }}" required>
@@ -30,6 +30,28 @@
                 <small>Sadece bu tarihten sonra vadesi dolan varantlar dahil edilir</small>
             </div>
 
+            <div class="mode-separator">
+                <span class="separator-line"></span>
+                <span class="separator-text">Veri Kaynağı (Opsiyonel)</span>
+                <span class="separator-line"></span>
+            </div>
+
+            <div class="csv-section">
+                <small class="csv-hint">CSV dosyaları yüklerseniz veritabanı yerine bu dosyalar kullanılır. Her iki dosya da yüklenmelidir veya hiçbiri yüklenmeyin.</small>
+
+                <div class="form-group">
+                    <label for="warrants_csv">Varant CSV Dosyası</label>
+                    <input type="file" id="warrants_csv" name="warrants_csv" accept=".csv">
+                    <small>Sütunlar: code, underlying, option_type, strike_price, issuer_name, expiry</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="prices_csv">Fiyat CSV Dosyası</label>
+                    <input type="file" id="prices_csv" name="prices_csv" accept=".csv">
+                    <small>Sütunlar: code, date, close</small>
+                </div>
+            </div>
+
             <button type="submit" class="btn-analyze">Analiz Et</button>
         </form>
 
@@ -37,5 +59,16 @@
             <p>Fintables Varant Analizi</p>
         </div>
     </div>
+
+    <script>
+    document.querySelector('form').addEventListener('submit', function(e) {
+        var w = document.getElementById('warrants_csv').files.length > 0;
+        var p = document.getElementById('prices_csv').files.length > 0;
+        if (w !== p) {
+            e.preventDefault();
+            alert('Lütfen her iki CSV dosyasını da yükleyin veya hiçbirini yüklemeyin.');
+        }
+    });
+    </script>
 </body>
 </html>
