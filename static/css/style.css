@@ -1,0 +1,418 @@
+/* Genel Ayarlar */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: #1a1a22;
+    color: #ffffff;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Ana Sayfa Header */
+.header {
+    text-align: center;
+    padding: 40px 0;
+}
+
+.header h1 {
+    font-size: 2.5rem;
+    color: #12B982;
+    margin-bottom: 10px;
+}
+
+.header .subtitle {
+    color: #888;
+    font-size: 1.1rem;
+}
+
+/* Form Stilleri */
+.form-container {
+    background: #28272D;
+    border-radius: 12px;
+    padding: 40px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #ccc;
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #48484D;
+    border-radius: 8px;
+    background: #1a1a22;
+    color: #fff;
+    font-size: 1rem;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #12B982;
+}
+
+.form-group small {
+    display: block;
+    margin-top: 6px;
+    color: #666;
+    font-size: 0.85rem;
+}
+
+.btn-analyze {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #12B982, #0a9a6a);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-analyze:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(18, 185, 130, 0.3);
+}
+
+/* Navigasyon Bar */
+.nav-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    margin-bottom: 20px;
+}
+
+.btn-back {
+    color: #12B982;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: opacity 0.2s;
+}
+
+.btn-back:hover {
+    opacity: 0.8;
+}
+
+.total-info {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Kart Wrapper */
+.card-wrapper {
+    margin-bottom: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* ==================== */
+/* ANA GÖRSEL KARTI     */
+/* 1080x1350 px boyut   */
+/* ==================== */
+.card {
+    background: #28272D;
+    border-radius: 12px;
+    padding: 40px 30px;
+    width: 540px;  /* 1080/2 for screen, will be 1080 in PNG with scale:2 */
+    height: 675px; /* 1350/2 for screen, will be 1350 in PNG with scale:2 */
+    display: flex;
+    flex-direction: column;
+}
+
+.card-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+/* Tarih - Beyaz renk */
+.date-range {
+    display: block;
+    font-size: 0.8rem;
+    color: #FFFFFF;
+    margin-bottom: 15px;
+    font-weight: 400;
+}
+
+/* Başlık kutusu - ince border, radius 12, renk #12B982 */
+.title-box {
+    display: inline-block;
+    border: 1px solid;
+    border-radius: 12px;
+    padding: 5px 14px;
+    margin-bottom: 5px;
+}
+
+.card.rising .title-box {
+    border-color: #12B982;
+}
+
+.card.falling .title-box {
+    border-color: #ff5252;
+}
+
+.card-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.card.rising .card-title {
+    color: #12B982;
+}
+
+.card.falling .card-title {
+    color: #ff5252;
+}
+
+.card-subtitle {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin-top: 8px;
+}
+
+/* ==================== */
+/* TABLO STİLLERİ       */
+/* ==================== */
+.warrant-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 4px 0;
+    font-size: 0.7rem;
+    flex-grow: 1;
+}
+
+/* Tablo başlıkları - bağımsız kutucuklar */
+.warrant-table thead tr {
+    background: transparent;
+}
+
+.warrant-table tbody::before {
+    content: '';
+    display: table-row;
+    height: 3px;
+}
+
+.warrant-table th {
+    background: #48484D;
+    color: #FFFFFF;
+    padding: 8px 5px;
+    text-align: center;
+    font-weight: 500;
+    font-size: 0.65rem;
+    border-radius: 12px;
+}
+
+.warrant-table th:nth-child(2) {
+    width: 12%;
+}
+
+.warrant-table td {
+    padding: 6px 5px;
+    font-size: 0.7rem;
+    color: #e0e0e0;
+    text-align: center;
+}
+
+.warrant-table tbody tr {
+    position: relative;
+}
+
+.warrant-table tbody tr::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 4px;
+    bottom: 0;
+    height: 0.5px;
+    background: #FFFFFF;
+    z-index: 2;
+}
+
+/* Değişim Yüzdesi */
+.change {
+    font-weight: 600;
+    padding: 6px 8px;
+}
+
+.change.positive {
+    color: #12B982;
+    background: #1F493F;
+}
+
+.change.negative {
+    color: #ff5252;
+    background: #4F1F1F;
+}
+
+/* Sadece ilk satırda border-radius */
+.warrant-table tbody tr:first-child .change {
+    border-radius: 6px 6px 0 0;
+}
+
+.code {
+    font-weight: 500;
+    color: #fff;
+}
+
+/* ==================== */
+/* KART FOOTER & LOGO   */
+/* ==================== */
+.card-footer {
+    margin-top: auto;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.card-footer .source-text {
+    font-size: 0.6rem;
+    color: #888;
+    margin-bottom: 3px;
+    text-align: center;
+}
+
+.card-footer .source-text .highlight {
+    color: #FFFFFF;
+    font-weight: 700;
+}
+
+/* Fintables Logo - CSS ile oluşturulmuş */
+.fintables-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 12px;
+    gap: 2px;
+}
+
+.fintables-logo .logo-icon {
+    background: #ff6b35;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.8rem;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+}
+
+.fintables-logo .logo-text {
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+}
+
+/* ==================== */
+/* İNDİRME BUTONLARI    */
+/* ==================== */
+.btn-download {
+    display: block;
+    width: 540px;
+    margin-top: 15px;
+    padding: 12px;
+    border: 2px solid;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: transparent;
+}
+
+.btn-download.green {
+    color: #12B982;
+    border-color: #12B982;
+}
+
+.btn-download.green:hover {
+    background: #12B982;
+    color: #fff;
+}
+
+.btn-download.red {
+    color: #ff5252;
+    border-color: #ff5252;
+}
+
+.btn-download.red:hover {
+    background: #ff5252;
+    color: #fff;
+}
+
+/* Hata Mesajı */
+.error-message {
+    background: #28272D;
+    border: 1px solid #ff5252;
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    max-width: 500px;
+    margin: 100px auto;
+}
+
+.error-message h2 {
+    color: #ff5252;
+    margin-bottom: 15px;
+}
+
+.error-message p {
+    color: #ccc;
+    margin-bottom: 25px;
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    padding: 40px 0;
+    color: #444;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .card {
+        width: 100%;
+        height: auto;
+        min-height: 600px;
+        padding: 20px 15px;
+    }
+
+    .btn-download {
+        width: 100%;
+    }
+
+    .warrant-table th,
+    .warrant-table td {
+        padding: 8px 5px;
+        font-size: 0.65rem;
+    }
+
+    .header h1 {
+        font-size: 1.8rem;
+    }
+}

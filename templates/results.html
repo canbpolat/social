@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Varant Analiz Sonuçları</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- html2canvas - PNG indirme için -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Hata varsa göster -->
+        {% if error %}
+        <div class="error-message">
+            <h2>Hata</h2>
+            <p>{{ error }}</p>
+            <a href="/" class="btn-back">Geri Dön</a>
+        </div>
+        {% else %}
+
+        <!-- Üst navigasyon -->
+        <div class="nav-bar">
+            <a href="/" class="btn-back">← Yeni Analiz</a>
+            <span class="total-info">Toplam {{ total_analyzed }} varant analiz edildi</span>
+        </div>
+
+        <!-- EN ÇOK YÜKSELEN VARANTLAR -->
+        <div class="card-wrapper">
+            <div id="rising-card" class="card rising">
+                <div class="card-header">
+                    <span class="date-range">{{ date_range }}</span>
+                    <div class="title-box">
+                        <h2 class="card-title">En Çok Yükselen</h2>
+                    </div>
+                    <h3 class="card-subtitle">Varantlar</h3>
+                </div>
+
+                <table class="warrant-table">
+                    <thead>
+                        <tr>
+                            <th>Varant</th>
+                            <th>Tür</th>
+                            <th>Dayanak Varlık</th>
+                            <th>İhraççı</th>
+                            <th>Kullanım Fiyatı</th>
+                            <th>Değişim (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for warrant in rising_warrants %}
+                        <tr>
+                            <td class="code">{{ warrant.code }}</td>
+                            <td>{{ warrant.option_type }}</td>
+                            <td>{{ warrant.underlying or '-' }}</td>
+                            <td>{{ warrant.issuer_name or '-' }}</td>
+                            <td>{{ "%.2f"|format(warrant.strike_price) }}</td>
+                            <td class="change positive">{{ "%.0f"|format(warrant.return_pct) }}%</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <div class="card-footer">
+                    <p class="source-text"><span class="highlight">Kaynak:</span> En çok yükselenler/varant için: <span class="highlight">Fiyata Yazım</span></p>
+                    <p class="source-text">İşlem adetleri için: <span class="highlight">Borsa İstanbul</span></p>
+                    <div class="fintables-logo">
+                        <div class="logo-icon">F</div>
+                        <span class="logo-text">intables</span>
+                    </div>
+                </div>
+            </div>
+            <button onclick="downloadImage('rising-card', 'yukselen_varantlar.png')" class="btn-download green">
+                PNG İndir (Yükselen)
+            </button>
+        </div>
+
+        <!-- EN ÇOK DÜŞEN VARANTLAR -->
+        <div class="card-wrapper">
+            <div id="falling-card" class="card falling">
+                <div class="card-header">
+                    <span class="date-range">{{ date_range }}</span>
+                    <div class="title-box">
+                        <h2 class="card-title">En Çok Düşen</h2>
+                    </div>
+                    <h3 class="card-subtitle">Varantlar</h3>
+                </div>
+
+                <table class="warrant-table">
+                    <thead>
+                        <tr>
+                            <th>Varant</th>
+                            <th>Tür</th>
+                            <th>Dayanak Varlık</th>
+                            <th>İhraççı</th>
+                            <th>Kullanım Fiyatı</th>
+                            <th>Değişim (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for warrant in falling_warrants %}
+                        <tr>
+                            <td class="code">{{ warrant.code }}</td>
+                            <td>{{ warrant.option_type }}</td>
+                            <td>{{ warrant.underlying or '-' }}</td>
+                            <td>{{ warrant.issuer_name or '-' }}</td>
+                            <td>{{ "%.2f"|format(warrant.strike_price) }}</td>
+                            <td class="change negative">{{ "%.0f"|format(warrant.return_pct) }}%</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <div class="card-footer">
+                    <p class="source-text"><span class="highlight">Kaynak:</span> En çok düşenler/varant için: <span class="highlight">Fiyata Yazım</span></p>
+                    <p class="source-text">İşlem adetleri için: <span class="highlight">Borsa İstanbul</span></p>
+                    <div class="fintables-logo">
+                        <div class="logo-icon">F</div>
+                        <span class="logo-text">intables</span>
+                    </div>
+                </div>
+            </div>
+            <button onclick="downloadImage('falling-card', 'dusen_varantlar.png')" class="btn-download red">
+                PNG İndir (Düşen)
+            </button>
+        </div>
+
+        {% endif %}
+    </div>
+
+    <script>
+        // PNG indirme fonksiyonu
+        function downloadImage(elementId, filename) {
+            const element = document.getElementById(elementId);
+
+            html2canvas(element, {
+                backgroundColor: '#0d0d14',
+                scale: 2, // Yüksek çözünürlük
+                useCORS: true
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = filename;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+    </script>
+</body>
+</html>

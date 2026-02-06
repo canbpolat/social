@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Varant Getiri Analizi</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Varant Getiri Analizi</h1>
+            <p class="subtitle">En çok yükselen ve düşen varantları analiz edin</p>
+        </div>
+
+        <form action="/analyze" method="POST" class="form-container">
+            <div class="form-group">
+                <label for="start_date">Başlangıç Tarihi</label>
+                <input type="date" id="start_date" name="start_date" value="{{ default_start }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="end_date">Bitiş Tarihi</label>
+                <input type="date" id="end_date" name="end_date" value="{{ default_end }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="expiry_date">Minimum Vade Tarihi (Expiry)</label>
+                <input type="date" id="expiry_date" name="expiry_date" value="{{ default_expiry }}">
+                <small>Sadece bu tarihten sonra vadesi dolan varantlar dahil edilir</small>
+            </div>
+
+            <button type="submit" class="btn-analyze">Analiz Et</button>
+        </form>
+
+        <div class="footer">
+            <p>Fintables Varant Analizi</p>
+        </div>
+    </div>
+</body>
+</html>
