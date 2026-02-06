@@ -28,6 +28,20 @@ def format_date_turkish(d):
     return f"{d.day} {TURKISH_MONTHS[d.month]} {d.year}"
 
 
+def format_date_range(start, end):
+    """Tarih aralığını kısa formatta döndürür:
+    Aynı ay/yıl: 23 - 30 Ocak 2026
+    Farklı ay, aynı yıl: 23 Ocak - 30 Şubat 2026
+    Farklı yıl: 23 Ocak 2026 - 30 Şubat 2027
+    """
+    if start.year == end.year and start.month == end.month:
+        return f"{start.day} - {end.day} {TURKISH_MONTHS[end.month]} {end.year}"
+    elif start.year == end.year:
+        return f"{start.day} {TURKISH_MONTHS[start.month]} - {end.day} {TURKISH_MONTHS[end.month]} {end.year}"
+    else:
+        return f"{format_date_turkish(start)} - {format_date_turkish(end)}"
+
+
 @app.route('/')
 def index():
     """Ana sayfa - Tarih seçim formu"""
@@ -99,7 +113,7 @@ def analyze():
         falling_data = bottom_10.to_dict('records')
 
         # Tarih aralığını Türkçe formatla
-        date_range = f"{format_date_turkish(start)} - {format_date_turkish(end)}"
+        date_range = format_date_range(start, end)
 
         return render_template('results.html',
                              rising_warrants=rising_data,

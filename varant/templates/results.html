@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Varant Analiz Sonuçları</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <!-- html2canvas - PNG indirme için -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -33,7 +36,7 @@
                     <div class="title-box">
                         <h2 class="card-title">En Çok Yükselen</h2>
                     </div>
-                    <h3 class="card-subtitle">Varantlar</h3>
+                    <h3 class="card-subtitle">Hisse Varantları</h3>
                 </div>
 
                 <table class="warrant-table">
@@ -48,25 +51,26 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% set max_rise = rising_warrants[0].return_pct if rising_warrants else 1 %}
+                        {% set min_rise = rising_warrants[-1].return_pct if rising_warrants else 0 %}
+                        {% set rise_range = max_rise - min_rise if max_rise != min_rise else 1 %}
                         {% for warrant in rising_warrants %}
+                        {% set ratio = 0.5 + 0.5 * ((warrant.return_pct - min_rise) / rise_range) %}
                         <tr>
                             <td class="code">{{ warrant.code }}</td>
                             <td>{{ warrant.option_type }}</td>
                             <td>{{ warrant.underlying or '-' }}</td>
                             <td>{{ warrant.issuer_name or '-' }}</td>
-                            <td>{{ "%.2f"|format(warrant.strike_price) }}</td>
-                            <td class="change positive">{{ "%.0f"|format(warrant.return_pct) }}%</td>
+                            <td>{{ "%.2f"|format(warrant.strike_price)|replace(".", ",") }}</td>
+                            <td class="change-cell"><div class="change-val positive{% if loop.first %} first{% endif %}" style="background: rgba(31, 73, 63, {{ '%.2f'|format(ratio) }});">%{{ "%.2f"|format(warrant.return_pct)|replace(".", ",") }}</div></td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
 
                 <div class="card-footer">
-                    <p class="source-text"><span class="highlight">Kaynak:</span> En çok yükselenler/varant için: <span class="highlight">Fiyata Yazım</span></p>
-                    <p class="source-text">İşlem adetleri için: <span class="highlight">Borsa İstanbul</span></p>
                     <div class="fintables-logo">
-                        <div class="logo-icon">F</div>
-                        <span class="logo-text">intables</span>
+                        <img src="{{ url_for('static', filename='img/Fintables_Logo_Dark.png') }}" alt="Fintables">
                     </div>
                 </div>
             </div>
@@ -83,7 +87,7 @@
                     <div class="title-box">
                         <h2 class="card-title">En Çok Düşen</h2>
                     </div>
-                    <h3 class="card-subtitle">Varantlar</h3>
+                    <h3 class="card-subtitle">Hisse Varantları</h3>
                 </div>
 
                 <table class="warrant-table">
@@ -98,25 +102,26 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% set max_fall = falling_warrants[0].return_pct|abs if falling_warrants else 1 %}
+                        {% set min_fall = falling_warrants[-1].return_pct|abs if falling_warrants else 0 %}
+                        {% set fall_range = max_fall - min_fall if max_fall != min_fall else 1 %}
                         {% for warrant in falling_warrants %}
+                        {% set ratio = 0.5 + 0.5 * ((warrant.return_pct|abs - min_fall) / fall_range) %}
                         <tr>
                             <td class="code">{{ warrant.code }}</td>
                             <td>{{ warrant.option_type }}</td>
                             <td>{{ warrant.underlying or '-' }}</td>
                             <td>{{ warrant.issuer_name or '-' }}</td>
-                            <td>{{ "%.2f"|format(warrant.strike_price) }}</td>
-                            <td class="change negative">{{ "%.0f"|format(warrant.return_pct) }}%</td>
+                            <td>{{ "%.2f"|format(warrant.strike_price)|replace(".", ",") }}</td>
+                            <td class="change-cell"><div class="change-val negative{% if loop.first %} first{% endif %}" style="background: rgba(79, 31, 31, {{ '%.2f'|format(ratio) }});">%{{ "%.2f"|format(warrant.return_pct)|replace(".", ",") }}</div></td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
 
                 <div class="card-footer">
-                    <p class="source-text"><span class="highlight">Kaynak:</span> En çok düşenler/varant için: <span class="highlight">Fiyata Yazım</span></p>
-                    <p class="source-text">İşlem adetleri için: <span class="highlight">Borsa İstanbul</span></p>
                     <div class="fintables-logo">
-                        <div class="logo-icon">F</div>
-                        <span class="logo-text">intables</span>
+                        <img src="{{ url_for('static', filename='img/Fintables_Logo_Dark.png') }}" alt="Fintables">
                     </div>
                 </div>
             </div>

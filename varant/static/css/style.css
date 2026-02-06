@@ -6,7 +6,7 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     background-color: #1a1a22;
     color: #ffffff;
     min-height: 100vh;
@@ -196,8 +196,8 @@ body {
 /* ==================== */
 .card {
     background: #28272D;
-    border-radius: 12px;
-    padding: 40px 30px;
+    border-radius: 0;
+    padding: 60px 30px 40px 30px;
     width: 540px;  /* 1080/2 for screen, will be 1080 in PNG with scale:2 */
     height: 675px; /* 1350/2 for screen, will be 1350 in PNG with scale:2 */
     display: flex;
@@ -206,7 +206,7 @@ body {
 
 .card-header {
     text-align: center;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
 /* Tarih - Beyaz renk */
@@ -214,7 +214,7 @@ body {
     display: block;
     font-size: 0.8rem;
     color: #FFFFFF;
-    margin-bottom: 15px;
+    margin-bottom: 6px;
     font-weight: 400;
 }
 
@@ -223,8 +223,8 @@ body {
     display: inline-block;
     border: 1px solid;
     border-radius: 12px;
-    padding: 5px 14px;
-    margin-bottom: 5px;
+    padding: 1px 10px 5px 10px;
+    margin-bottom: 0px;
 }
 
 .card.rising .title-box {
@@ -253,7 +253,7 @@ body {
     font-size: 1.4rem;
     font-weight: 600;
     color: #ffffff;
-    margin-top: 8px;
+    margin-top: 1px;
 }
 
 /* ==================== */
@@ -262,9 +262,8 @@ body {
 .warrant-table {
     width: 100%;
     border-collapse: separate;
-    border-spacing: 4px 0;
+    border-spacing: 2px 0;
     font-size: 0.7rem;
-    flex-grow: 1;
 }
 
 /* Tablo başlıkları - bağımsız kutucuklar */
@@ -285,7 +284,7 @@ body {
     text-align: center;
     font-weight: 500;
     font-size: 0.65rem;
-    border-radius: 12px;
+    border-radius: 6px;
 }
 
 .warrant-table th:nth-child(2) {
@@ -293,8 +292,8 @@ body {
 }
 
 .warrant-table td {
-    padding: 6px 5px;
-    font-size: 0.7rem;
+    padding: 10px 5px;
+    font-size: 0.8rem;
     color: #e0e0e0;
     text-align: center;
 }
@@ -307,33 +306,38 @@ body {
     content: '';
     position: absolute;
     left: 0;
-    right: 4px;
+    right: 2px;
     bottom: 0;
-    height: 0.5px;
-    background: #FFFFFF;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.3);
     z-index: 2;
 }
 
+
 /* Değişim Yüzdesi */
-.change {
+.change-cell {
+    padding: 0 !important;
+}
+
+.change-val {
     font-weight: 600;
-    padding: 6px 8px;
+    padding: 10px 8px;
+    color: #FFFFFF;
+    text-align: center;
 }
 
-.change.positive {
-    color: #12B982;
-    background: #1F493F;
+.change-val.positive {
+    background: rgba(31, 73, 63, 1);
 }
 
-.change.negative {
-    color: #ff5252;
-    background: #4F1F1F;
+.change-val.negative {
+    background: rgba(79, 31, 31, 1);
 }
 
-/* Sadece ilk satırda border-radius */
-.warrant-table tbody tr:first-child .change {
+.change-val.first {
     border-radius: 6px 6px 0 0;
 }
+
 
 .code {
     font-weight: 500;
@@ -345,12 +349,12 @@ body {
 /* ==================== */
 .card-footer {
     margin-top: auto;
-    padding-top: 15px;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 5px;
+    border-top: none;
 }
 
 .card-footer .source-text {
-    font-size: 0.6rem;
+    font-size: 0.5rem;
     color: #888;
     margin-bottom: 3px;
     text-align: center;
@@ -358,36 +362,20 @@ body {
 
 .card-footer .source-text .highlight {
     color: #FFFFFF;
-    font-weight: 700;
+    font-weight: 600;
 }
 
-/* Fintables Logo - CSS ile oluşturulmuş */
+/* Fintables Logo - SVG */
 .fintables-logo {
     display: flex;
     align-items: center;
     justify-content: center;
     margin-top: 12px;
-    gap: 2px;
 }
 
-.fintables-logo .logo-icon {
-    background: #ff6b35;
-    color: #fff;
-    font-weight: 700;
-    font-size: 0.8rem;
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-}
-
-.fintables-logo .logo-text {
-    color: #fff;
-    font-weight: 600;
-    font-size: 0.8rem;
-    letter-spacing: 0.5px;
+.fintables-logo img {
+    height: 48px;
+    width: auto;
 }
 
 /* ==================== */

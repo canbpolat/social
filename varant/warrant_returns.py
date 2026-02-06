@@ -30,8 +30,18 @@ def load_warrants_from_csv(csv_source, end_date, min_expiry=None):
     if missing:
         raise ValueError(f"Varant CSV'de eksik sütunlar: {', '.join(missing)}")
 
+    ISSUER_MAPPING = {
+        'IYM': 'İş Yatırım',
+        'AKM': 'Ak Yatırım',
+        'GRM': 'Garanti Yatırım',
+        'IYF': 'İnfo Yatırım',
+        'GSI': 'Goldman Sachs',
+        'BNP': 'BNP Paribas',
+    }
+
     if 'issuer_name' not in df.columns:
-        df['issuer_name'] = df.get('issuer_id', '-')
+        issuer_col = df.get('issuer_id', pd.Series('-', index=df.index))
+        df['issuer_name'] = issuer_col.map(ISSUER_MAPPING).fillna(issuer_col)
 
     df['code'] = df['code'].str.strip()
     df['expiry'] = pd.to_datetime(df['expiry']).dt.date
